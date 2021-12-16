@@ -1,0 +1,55 @@
+server:
+  port: 8999
+  
+eureka:
+  instance:
+    hostname: localhost
+    
+    
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+      - id: vehicle-service
+        uri: lb://vehicle-service 
+        predicates: 
+          - Path=/vehicle/**
+        filters:  
+          - name: CircuitBreaker
+            args:              name: vehicle-service
+              fallbackuri: forward:/vehicleService
+          
+          
+      - id: films-service
+        uri: lb://films-service 
+        predicates: 
+          - Path=/films/**
+        filters:  
+          - name: CircuitBreaker
+            args:
+              name: filmss-service
+              fallbackuri: forward:/filmsServiceFallback
+              
+hystrix:
+ command:
+  fallbackcmd:
+   execution:
+     isolation:
+       thread:
+         timeoutInMillieseconds: 5000
+         
+         
+management:
+  endpoints:
+    web:
+      exposure:
+       include: hystrix.stream
+         
+   
+               
+              
+              
+              
+              
